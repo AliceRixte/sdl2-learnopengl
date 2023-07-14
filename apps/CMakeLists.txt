@@ -3,6 +3,15 @@ cmake_minimum_required(VERSION 3.11-3.18)
 
 file( GLOB APP_SOURCES "${CMAKE_SOURCE_DIR}/apps/*.cpp" )
 
+add_custom_target(copy_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/resources
+    ${PROJECT_BINARY_DIR}/resources
+    COMMENT "Copying resources into binary directory ${PROJECT_BINARY_DIR} ezahf_èGEZF8I76z"
+    )
+
+
+
 foreach( APP_SOURCE ${APP_SOURCES} )
     get_filename_component(APP_NAME ${APP_SOURCE} NAME_WE)
 
@@ -17,6 +26,8 @@ foreach( APP_SOURCE ${APP_SOURCES} )
     target_link_libraries(${APP_NAME} ${SDL2_LIBRARIES})
     target_link_libraries(${APP_NAME} ${OPENGL_LIBRARIES})
     target_link_libraries(${APP_NAME} ${GLEW_LIBRARIES})
+
+    add_dependencies(${APP_NAME} copy_resources)
 
     target_link_libraries(${APP_NAME} learnopengl)
 
