@@ -1,0 +1,10 @@
+{
+  "name": "grasp-gl",
+  "version": "0.0.0",
+  "dependencies": [
+    "sdl2",
+    "opengl",
+    "glew"
+  ],
+  "builtin-baseline": "7771648f32626142222bbd3b91421e53314bee69"
+}
