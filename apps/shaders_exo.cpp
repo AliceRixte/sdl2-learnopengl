@@ -54,8 +54,8 @@ int main( int argc, char * argv[] )
         glViewport(0, 0, width, height);
     }
 
-    Shader shader((resourcePath / "multicolorTriangle.vs").string()
-        , (resourcePath / "multicolorTriangle.fs").string());
+    Shader shader((resourcePath / "multicolorTriangle_exo.vs").string()
+        , (resourcePath / "multicolorTriangle_exo.fs").string());
 
     unsigned int VAO,VBO;
 
@@ -95,8 +95,11 @@ int main( int argc, char * argv[] )
         glClearColor(0.1f,0.1f,0.1f, 1.0f);
         glClear( GL_COLOR_BUFFER_BIT );
 
+        int currentTime = SDL_GetTicks();
+
+
         shader.use();
-        glBindVertexArray(VAO);
+        shader.setFloat("offset",sin(currentTime/1000.0)/2.0f);
         glDrawArrays(GL_TRIANGLES,0,3);
 
 
