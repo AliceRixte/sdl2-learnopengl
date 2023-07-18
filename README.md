@@ -25,11 +25,11 @@ I'm learning OpenGL using Joey de Vries's excellent book Learn OpenGL, except I'
 
     ```
 
-    followed by
+    followed by (to be changed when new vcpkg is released in september 2023)
 
     ```
 
-    vcpkg install
+    vcpkg install --triplet x64-windows
 
     ```
 
