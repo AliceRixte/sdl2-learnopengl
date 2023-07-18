@@ -10,8 +10,8 @@
 
 namespace fs =  std::filesystem;
 
-const fs::path resourcePath = 
-    fs::current_path().parent_path().parent_path() / "resources";
+const fs::path shadersPath = 
+    fs::current_path().parent_path().parent_path() / "resources"/ "shaders";
 
 float vertices[] = {
     -0.5f, -0.5f, 0.0f, 1.0f , 0.0f, 0.0f, 
@@ -54,8 +54,8 @@ int main( int argc, char * argv[] )
         glViewport(0, 0, width, height);
     }
 
-    Shader shader((resourcePath / "multicolorTriangle_exo.vs").string()
-        , (resourcePath / "multicolorTriangle_exo.fs").string());
+    Shader shader((shadersPath / "multicolorTriangle_exo.vs").string()
+        , (shadersPath / "multicolorTriangle_exo.fs").string());
 
     unsigned int VAO,VBO;
 
