@@ -26,6 +26,7 @@ foreach( APP_SOURCE ${APP_SOURCES} )
     target_link_libraries(${APP_NAME} ${SDL2_LIBRARIES})
     target_link_libraries(${APP_NAME} ${OPENGL_LIBRARIES})
     target_link_libraries(${APP_NAME} ${GLEW_LIBRARIES})
+    target_link_libraries(${APP_NAME} $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
 
     add_dependencies(${APP_NAME} copy_resources)
 

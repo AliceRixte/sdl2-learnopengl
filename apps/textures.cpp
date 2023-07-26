@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
+#include <SDL2/SDL_image.h>
 
 //#include <SDL2/SDL_opengl.h>
 
@@ -13,11 +14,16 @@ namespace fs =  std::filesystem;
 const fs::path shadersPath = 
     fs::current_path().parent_path().parent_path() / "resources" / "shaders";
 
+const fs::path texturesPath = 
+    fs::current_path().parent_path().parent_path() / "resources" / "textures";
+
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f, 1.0f , 0.0f, 0.0f, 
-     0.5f, -0.5f, 0.0f, 0.0f , 1.0f, 0.0f,
-     0.0f,  0.5f, 0.0f, 0.0f , 0.0f, 1.0f
-};  
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.5f, 1.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+};
 
 
 
@@ -54,23 +60,60 @@ int main( int argc, char * argv[] )
         glViewport(0, 0, width, height);
     }
 
-    Shader shader((shadersPath / "multicolorTriangle.vs").string()
-        , (shadersPath / "multicolorTriangle.fs").string());
+    Shader shader((shadersPath / "texture.vs").string()
+        , (shadersPath / "texture.fs").string());
 
-    unsigned int VAO,VBO;
 
+   
+    //glBindBuffer(GL_ARRAY_BUFFER,0);
+
+
+    unsigned int square[6] = {0,1,2,0,2,3};
+
+    GLuint VBO, VAO,EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
-
+    
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(square),square, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6* sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+
+    GLuint texture; 
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    SDL_Surface* surface =IMG_Load(
+        (texturesPath / "wall.jpg").string().c_str());
+    if(surface){
+        int mode = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D ,0, mode, surface ->w, surface -> h 
+            ,0 , mode, GL_UNSIGNED_BYTE, surface -> pixels);
+        SDL_FreeSurface(surface);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else{
+        std::cerr << "ERROR::TEXTURE::LOADING" << std::endl
+            << "SDL_image log : " << IMG_GetError() <<std::endl;
+    }
+
 
     bool keepRunning = true;
 
@@ -96,8 +139,9 @@ int main( int argc, char * argv[] )
         glClear( GL_COLOR_BUFFER_BIT );
 
         shader.use();
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES,0,3);
+        glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT, 0 );
 
 
         SDL_GL_SwapWindow( window );
