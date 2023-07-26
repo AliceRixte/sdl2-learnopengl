@@ -19,7 +19,7 @@ const fs::path texturesPath =
 
 float vertices[] = {
     // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.5f, 1.0f,   // top right
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
     -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
@@ -119,9 +119,10 @@ int main( int argc, char * argv[] )
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     surface =IMG_Load(
-        (texturesPath / "water.jpeg").string().c_str());
+        (texturesPath / "awesomeface.png").string().c_str());
     if(surface){
         int mode = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+        flip_surface(surface);
         glTexImage2D(GL_TEXTURE_2D ,0, mode, surface ->w, surface -> h 
             ,0 , mode, GL_UNSIGNED_BYTE, surface -> pixels);
         SDL_FreeSurface(surface);
@@ -131,10 +132,6 @@ int main( int argc, char * argv[] )
         std::cerr << "ERROR::TEXTURE::LOADING" << std::endl
             << "SDL_image log : " << IMG_GetError() <<std::endl;
     }
-
-    
-
-
 
     bool keepRunning = true;
 
