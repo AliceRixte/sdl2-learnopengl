@@ -8,6 +8,7 @@
 #include <filesystem>
 
 #include "learnopengl.h"
+#include "math.h"
 
 namespace fs =  std::filesystem;
 
@@ -61,7 +62,7 @@ int main( int argc, char * argv[] )
     }
 
     Shader shader((shadersPath / "textures.vs").string()
-        , (shadersPath / "textures.fs").string());
+        , (shadersPath / "textures_exo.fs").string());
 
     unsigned int square[6] = {0,1,2,0,2,3};
 
@@ -160,7 +161,10 @@ int main( int argc, char * argv[] )
         glClearColor(0.1f,0.1f,0.1f, 1.0f);
         glClear( GL_COLOR_BUFFER_BIT );
 
+
+
         shader.use();
+        shader.setFloat("direction", (SDL_GetTicks()/1000) % 2);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture0);
         glActiveTexture(GL_TEXTURE1);
