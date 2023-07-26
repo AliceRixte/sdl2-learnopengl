@@ -63,11 +63,6 @@ int main( int argc, char * argv[] )
     Shader shader((shadersPath / "texture.vs").string()
         , (shadersPath / "texture.fs").string());
 
-
-   
-    //glBindBuffer(GL_ARRAY_BUFFER,0);
-
-
     unsigned int square[6] = {0,1,2,0,2,3};
 
     GLuint VBO, VAO,EBO;
@@ -91,9 +86,9 @@ int main( int argc, char * argv[] )
     glEnableVertexAttribArray(2);
 
 
-    GLuint texture; 
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    GLuint texture0; 
+    glGenTextures(1, &texture0);
+    glBindTexture(GL_TEXTURE_2D, texture0);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_CLAMP_TO_EDGE);
@@ -114,8 +109,38 @@ int main( int argc, char * argv[] )
             << "SDL_image log : " << IMG_GetError() <<std::endl;
     }
 
+    GLuint texture1; 
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,  GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    surface =IMG_Load(
+        (texturesPath / "water.jpeg").string().c_str());
+    if(surface){
+        int mode = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D ,0, mode, surface ->w, surface -> h 
+            ,0 , mode, GL_UNSIGNED_BYTE, surface -> pixels);
+        SDL_FreeSurface(surface);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else{
+        std::cerr << "ERROR::TEXTURE::LOADING" << std::endl
+            << "SDL_image log : " << IMG_GetError() <<std::endl;
+    }
+
+    
+
+
 
     bool keepRunning = true;
+
+    shader.use();
+    shader.setInt("texture0",0);
+    shader.setInt("texture1",1);
 
     while(keepRunning)
     {
@@ -139,7 +164,10 @@ int main( int argc, char * argv[] )
         glClear( GL_COLOR_BUFFER_BIT );
 
         shader.use();
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture1);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT, 0 );
 
